@@ -1,16 +1,18 @@
-function[Ix,Iy,Iz,prn,satnum,maxnum,fw,pw,EWL,FC,pc]=SD(OBSprn,BASEprn,obsnum,xus,yus,zus,Utheta,basenum,x0,EWLb,EWLu,Base,User)
+function[Ix,Iy,Iz,prn,satnum,maxnum,fw,pw,EWL,FC,pc]=SD(EWLb,basenum,Base,EWLu,obsnum,User)
+% 进行单差计算
+
 satnum=0;
 for  i=1:obsnum
     for  j=1:basenum
         if(OBSprn(i)==BASEprn(j))
             satnum=satnum+1;
-            r=sqrt((xus(i)-x0(1))^2+(yus(i)-x0(2))^2+(zus(i)-x0(3))^2);
-            Ix(satnum) = (xus(i) - x0(1))/r;
-            Iy(satnum) = (yus(i) - x0(2))/r;
-            Iz(satnum) = (zus(i) - x0(3))/r;
-            Utheta1(satnum)=Utheta(i);
-            fw(satnum) = 0.005^2*(1+(1/Utheta1(satnum)^2));
-            pw(satnum) = 0.5^2*(1+(1/Utheta1(satnum)^2));
+            r=sqrt((xs(i)-x0(1))^2+(ys(i)-x0(2))^2+(zs(i)-x0(3))^2);
+            Ix(satnum) = (xs(i) - x0(1))/r;
+            Iy(satnum) = (ys(i) - x0(2))/r;
+            Iz(satnum) = (zs(i) - x0(3))/r;
+            theta1(satnum)= theta(i);
+            fw(satnum) = 0.005^2*(1+(1/theta1(satnum)^2));
+            pw(satnum) = 0.5^2*(1+(1/theta1(satnum)^2));
             prn(satnum)= OBSprn(i);
             
             % 单差的伪距、载波观测量

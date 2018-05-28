@@ -28,11 +28,11 @@ S=[-sin(lambda) cos(lambda) 0;...
 h=waitbar(0,'ÇëµÈ´ý...');
 group=2880;
 for m=1:group
-    [BASEprn,EWLb,basenum,xbs,ybs,zbs,rb,Base]=BASESateposAndC1c(navdata,basedata,x0,S,m);
+    [EWLb,basenum,Base]=BASESateposAndC1c(navdata,basedata,x0,S,m);
     
-    [OBSprn,EWLu,obsnum,Utheta,xus,yus,zus,ru,User]=BASESateposAndC1c(navdata,obsdata,x0,S,m);
+    [EWLu,obsnum,User]=BASESateposAndC1c(navdata,obsdata,x0,S,m);
      
-%     [OBSprn,EWLu,obsnum,Utheta,xus,yus,zus,ru,User]=OBSSateposAndC1c(navdata,obsdata,x1,S,m);
+%   [OBSprn,EWLu,obsnum,Utheta,xus,yus,zus,ru,User]=OBSSateposAndC1c(navdata,obsdata,x1,S,m);
     [Ix,Iy,Iz,prn,satnum,maxnum,fw,pw,EWL,FC,pc]=SD(OBSprn,BASEprn,obsnum,xus,yus,zus,Utheta,basenum,x0,EWLb,EWLu,Base,User);
     [N,d,Qxn,Qn,NEWL,NWL1,N1,N2,N3,DOP]=DD(satnum,Ix,Iy,Iz,maxnum,fw,pw,EWL,FC,pc);
     

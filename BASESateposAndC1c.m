@@ -1,4 +1,4 @@
-function[BASEprn,EWLb,basenum,xbs,ybs,zbs,rb,Base]=BASESateposAndC1c(navdata,basedata,x0,S,m)
+function[EWLb,basenum,Base]=BASESateposAndC1c(navdata,basedata,x0,S,m)
 % 计算卫星的坐标及接收机伪距
 
 a1=m;
@@ -133,12 +133,12 @@ for a2=1:basedata.epoch(a1).gpsobs
         basenum = basenum+1;
         
         % 计算FCub(ρu)即在概略点处据卫星的距离与基站与卫星距离差、Ru、卫星角度theta
-        Rtheta(basenum) =theta;
-        xbs(basenum)=X;        %根据用户接收机计算得到的卫星坐标(xus,yus,zus)
-        ybs(basenum)=Y;
-        zbs(basenum)=Z;
-        BASEprn(basenum) = num;
-        rb(basenum)=sqrt((xbs(basenum)-x0(1))^2+(ybs(basenum)-x0(2))^2+(zbs(basenum)-x0(3))^2);
+        Base(basenum).theta =theta;
+        Base(basenum).xs=X;        %根据用户接收机计算得到的卫星坐标(xus,yus,zus)
+        Base(basenum).ys=Y;
+        Base(basenum).zs=Z;
+        Base(basenum).prn = num;
+        Base(basenum).r=sqrt((X-x0(1))^2+(Y-x0(2))^2+(Z-x0(3))^2);
         
         c = 2.99792458e8;%光速
         f1=1561.098e6;
@@ -147,27 +147,27 @@ for a2=1:basedata.epoch(a1).gpsobs
         %% 不同频率下的伪距、载波观测量和进行RTK的计算量
         lamda = c/f1; %波长λ1
         % 伪距、载波观测量
-        EWLb.FCb1(basenum)=basedata.epoch(a1).gps(a2).L2I*lamda;
-        EWLb.pcb1(basenum) = basedata.epoch(a1).gps(a2).C2I;
+        EWLb(basenum).FC1 = basedata.epoch(a1).gps(a2).L2I*lamda;
+        EWLb(basenum).pc1 = basedata.epoch(a1).gps(a2).C2I;
         % RTK的计算量
-        Base.FCb1(basenum)=basedata.epoch(a1).gps(a2).L2I*lamda-rb(basenum);
-        Base.pcb1(basenum) = basedata.epoch(a1).gps(a2).C2I-rb(basenum);
+        Base(basenum).FC1 = basedata.epoch(a1).gps(a2).L2I*lamda-Base(basenum).r;
+        Base(basenum).pc1 = basedata.epoch(a1).gps(a2).C2I-Base(basenum).r;
         
         % 伪距、载波观测量
         lamda = c/f2; %波长λ2
-        EWLb.FCb2(basenum)=basedata.epoch(a1).gps(a2).L7I*lamda;
-        EWLb.pcb2(basenum) = basedata.epoch(a1).gps(a2).C7I;
+        EWLb(basenum).FC2=basedata.epoch(a1).gps(a2).L7I*lamda;
+        EWLb(basenum).pc2 = basedata.epoch(a1).gps(a2).C7I;
         % RTK的计算量
-        Base.FCb2(basenum)=basedata.epoch(a1).gps(a2).L7I*lamda-rb(basenum);
-        Base.pcb2(basenum) = basedata.epoch(a1).gps(a2).C7I-rb(basenum);
+        Base(basenum).FC2=basedata.epoch(a1).gps(a2).L7I*lamda-Base(basenum).r;
+        Base(basenum).pc2 = basedata.epoch(a1).gps(a2).C7I-Base(basenum).r;
         
         % 伪距、载波观测量
         lamda = c/f3; %波长λ3
-        EWLb.FCb3(basenum)=basedata.epoch(a1).gps(a2).L6I*lamda;
-        EWLb.pcb3(basenum) = basedata.epoch(a1).gps(a2).C6I;
+        EWLb(basenum).FC3=basedata.epoch(a1).gps(a2).L6I*lamda;
+        EWLb(basenum).pc3 = basedata.epoch(a1).gps(a2).C6I;
         % RTK的计算量
-        Base.FCb3(basenum)=basedata.epoch(a1).gps(a2).L6I*lamda-rb(basenum);
-        Base.pcb3(basenum) = basedata.epoch(a1).gps(a2).C6I-rb(basenum);
+        Base(basenum).FC3=basedata.epoch(a1).gps(a2).L6I*lamda-Base(basenum).r;
+        Base(basenum).pc3 = basedata.epoch(a1).gps(a2).C6I-Base(basenum).r;
         
         
     end
