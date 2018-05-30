@@ -31,9 +31,9 @@ for m=1:group
     [EWLb,basenum,Base]=BASESateposAndC1c(navdata,basedata,x0,S,m);
     
     [EWLu,obsnum,User]=BASESateposAndC1c(navdata,obsdata,x0,S,m);
-     
-%   [OBSprn,EWLu,obsnum,Utheta,xus,yus,zus,ru,User]=OBSSateposAndC1c(navdata,obsdata,x1,S,m);
-    [Ix,Iy,Iz,prn,satnum,maxnum,fw,pw,EWL,FC,pc]=SD(OBSprn,BASEprn,obsnum,xus,yus,zus,Utheta,basenum,x0,EWLb,EWLu,Base,User);
+    
+    %   [OBSprn,EWLu,obsnum,Utheta,xus,yus,zus,ru,User]=OBSSateposAndC1c(navdata,obsdata,x1,S,m);
+    [Ix,Iy,Iz,prn,satnum,maxnum,fw,pw,EWL,FC,pc]=SD(EWLb,basenum,Base,EWLu,obsnum,User,x0);
     [N,d,Qxn,Qn,NEWL,NWL1,N1,N2,N3,DOP]=DD(satnum,Ix,Iy,Iz,maxnum,fw,pw,EWL,FC,pc);
     
     
@@ -46,37 +46,44 @@ for m=1:group
     posf.y(m) = df(2)+x0(2);
     posf.z(m) = df(3)+x0(3);
     %% 求取CEP
-    %用户站的真实坐标
-    x1=[-2364337.4414;4870285.6211;-3360809.6724];
+    %--求取用户站解算结果与真实坐标差--%
     aberration.dx(m) = posf.x(m)-x1(1);
     aberration.dy(m) = posf.y(m)-x1(2);
     aberration.dz(m) = posf.z(m)-x1(3);
-    env=S*[aberration.dx(m);aberration.dy(m);aberration.dz(m)];
-    CEP.L(m) = sqrt(env(1)^2+env(2)^2) ;
-    CEP.H(m) = env(3);
+    if((abs(aberration.dx(m))<=0.1)&&(abs(aberration.dy(m))<=0.1)&&(abs(aberration.dz(m))<=0.1))
+       correct = correct +1;
+       dx(correct) = aberration.dx(m);
+       dy(correct) = aberration.dy(m);
+       dz(correct) = aberration.dz(m);
+       TRENU = S * [dx(correct);dy(correct);dz(correct)];
+       CEP95(correct) = sqrt(TRENU(1)^2+TRENU(2)^2) ;         
+    end
+%     env=S*[aberration.dx(m);aberration.dy(m);aberration.dz(m)];
+%     CEP.L(m) = sqrt(env(1)^2+env(2)^2) ;
+%     CEP.H(m) = env(3);
     
     st.num(m) = satnum;
     string = ['运行中  ',num2str(floor(m/group*100)),'%'];
     waitbar(m/group,h,string);
 end
 close(h);
-cepl=sort(CEP.L,'ascend');
-CEPL95 = cepl(round(2880*0.95));
+cepl=sort(CEP95,'ascend');
+CEPL95 = cepl(round(correct*0.95));
 fprintf('CEPL95为%.8f\n',CEPL95);
-ceph=sort(CEP.H,'ascend');
-CEPH95 = ceph(round(2880*0.95));
-fprintf('CEPH95为%.8f\n',CEPH95);
+% ceph=sort(CEP.H,'ascend');
+% CEPH95 = ceph(round(2880*0.95));
+% fprintf('CEPH95为%.8f\n',CEPH95);
 
 
 figure(1)
 plot(st.num,'.black')
 
 figure(2)
-plot(aberration.dx,'.blue')
+plot(dx,'.blue')
 hold on;
-plot(aberration.dy,'.green')
+plot(dy,'.green')
 hold on;
-plot(aberration.dz,'.red')
+plot(dz,'.red')
 
 figure(3)
 plot(DOP1.HDOP,'blue')
